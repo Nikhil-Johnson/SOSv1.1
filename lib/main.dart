@@ -1,293 +1,167 @@
-import 'package:flutter/material.dart';
-import 'package:shake/shake.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:telephony/telephony.dart';
-import 'phone_numbers_page.dart';
 import 'dart:async';
-import 'package:geolocator/geolocator.dart';
+import 'dart:io';
 
-void main() {
-  runApp(const CalculatorApp());
+import 'package:flutter/material.dart';
+import 'package:telephony/telephony.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:record/record.dart';
+import 'package:shake/shake.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
 }
 
-class CalculatorApp extends StatelessWidget {
-  const CalculatorApp({super.key});
-
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Calculator SOS',
-      home: const Calculator(),
-      debugShowCheckedModeBanner: false,
+      title: 'SOS Calculator',
+      theme: ThemeData.dark(),
+      home: const CalculatorPage(),
     );
   }
 }
 
-class Calculator extends StatefulWidget {
-  const Calculator({super.key});
-
+class CalculatorPage extends StatefulWidget {
+  const CalculatorPage({super.key});
   @override
-  _CalculatorState createState() => _CalculatorState();
+  State<CalculatorPage> createState() => _CalculatorPageState();
 }
 
-class _CalculatorState extends State<Calculator> {
-  late ShakeDetector _shakeDetector;
-  final Telephony telephony = Telephony.instance;
+class _CalculatorPageState extends State<CalculatorPage> {
+  String _display = "";
+  bool _isTriggered = false;
 
-  String _output = "";
-  String _expression = "";
-  bool _sosTriggered = false;
-  Timer? _sosTimer;
+  final Telephony telephony = Telephony.instance;
+  final ImagePicker _picker = ImagePicker();
+  final Record _record = Record();
 
   @override
   void initState() {
     super.initState();
-
-    // Request SMS permission properly
-    telephony.requestSmsPermissions;
-
-    // Request location permission properly
-    _requestLocationPermission();
-
-    _shakeDetector = ShakeDetector.autoStart(onPhoneShake: () {
-      _handleSosTrigger(triggeredBy: 'shake');
-      _startSosLoop();
-    });
-  }
-
-  Future<void> _requestLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    if (permission == LocationPermission.deniedForever) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Location permission permanently denied. Please enable it in settings.")),
-        );
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _shakeDetector.stopListening();
-    _stopSosLoop();
-    super.dispose();
-  }
-
-  buttonPressed(String text) {
-    setState(() {
-      if (text == "C") {
-        _output = "";
-        _expression = "";
-        _sosTriggered = false;
-        _stopSosLoop();
-      } else if (text == "=") {
-        if (_expression == "911") {
-          _sosTriggered = true;
-          _output = "🚨 SOS Triggered ";
-          _handleSosTrigger(triggeredBy: 'manual');
-          _startSosLoop();
-        } else {
-          try {
-            final result = _calculate(_expression);
-            _output = result.toString();
-          } catch (e) {
-            _output = "Error";
-          }
-        }
-      } else {
-        _expression += text;
-        _output = _expression;
-      }
-    });
-  }
-
-  Future<void> _handleSosTrigger({required String triggeredBy}) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> numbers =
-        prefs.getStringList('sos_numbers') ?? <String>[];
-    if (numbers.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No phone numbers configured for SOS.')),
-        );
-      }
-      return;
-    }
-
-    final String message = await _getLocationMessage();
-
-    for (final to in numbers) {
-      final cleaned = to.trim();
-      if (cleaned.isEmpty) continue;
-      try {
-        telephony.sendSms(to: cleaned, message: message);
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to send SMS to $cleaned')),
-          );
-        }
-      }
-    }
-
-    if (mounted) {
-      setState(() {
-        _sosTriggered = true;
-        _output = "🚨 SOS Sent ($triggeredBy)";
-      });
-    }
-  }
-
-  Future<String> _getLocationMessage() async {
-    try {
-      Position pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      return "I am in danger! My location: https://maps.google.com/?q=${pos.latitude},${pos.longitude}";
-    } catch (e) {
-      return "I am in danger! (Location unavailable)";
-    }
-  }
-
-  void _startSosLoop() {
-    _stopSosLoop();
-    _sosTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      if (_sosTriggered) {
-        _handleSosTrigger(triggeredBy: 'auto');
-      } else {
-        _stopSosLoop();
-      }
-    });
-  }
-
-  void _stopSosLoop() {
-    _sosTimer?.cancel();
-    _sosTimer = null;
-  }
-
-  double _calculate(String expr) {
-    try {
-      if (expr.contains("+")) {
-        var parts = expr.split("+");
-        return double.parse(parts[0]) + double.parse(parts[1]);
-      } else if (expr.contains("-")) {
-        var parts = expr.split("-");
-        return double.parse(parts[0]) - double.parse(parts[1]);
-      } else if (expr.contains("×")) {
-        var parts = expr.split("×");
-        return double.parse(parts[0]) * double.parse(parts[1]);
-      } else if (expr.contains("÷")) {
-        var parts = expr.split("÷");
-        return double.parse(parts[0]) / double.parse(parts[1]);
-      }
-    } catch (e) {
-      return double.nan;
-    }
-    return double.tryParse(expr) ?? 0.0;
-  }
-
-  Widget buildButton(String text, {Color? color}) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(6.0),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.all(22),
-            backgroundColor: color ??
-                (_sosTriggered ? Colors.red : Colors.green),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          child: Text(
-            text,
-            style: const TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          onPressed: () => buttonPressed(text),
-        ),
-      ),
+    // Shake detection
+    ShakeDetector detector = ShakeDetector.autoStart(
+      onPhoneShake: () {
+        _triggerSOS();
+      },
     );
   }
 
-  void _openPhoneNumbersPage() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const PhoneNumbersPage()),
+  void _onPressed(String value) {
+    setState(() {
+      _display += value;
+      if (_display == "911") {
+        _triggerSOS();
+      }
+    });
+  }
+
+  Future<void> _triggerSOS() async {
+    if (_isTriggered) return;
+    setState(() => _isTriggered = true);
+
+    // 1. Change UI
+    setState(() {});
+
+    // 2. Send SMS with location + photo link
+    String message = await _composeSOSMessage();
+    telephony.sendSms(
+      to: "7736234006",
+      message: message,
+    );
+
+    // 3. Make a call
+    final Uri launchUri = Uri(scheme: 'tel', path: "7736234006");
+    await launchUrl(launchUri);
+
+    // 4. Start recording audio locally
+    await _startRecording();
+  }
+
+  Future<String> _composeSOSMessage() async {
+    String msg = "🚨 EMERGENCY! Please help.\n";
+
+    // Location
+    try {
+      Position pos = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      msg += "📍 Location: https://maps.google.com/?q=${pos.latitude},${pos.longitude}\n";
+    } catch (e) {
+      msg += "📍 Location unavailable.\n";
+    }
+
+    // Photo upload
+    try {
+      final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+      if (photo != null) {
+        String url = await _uploadToFirebase(File(photo.path));
+        msg += "📸 Photo: $url\n";
+      } else {
+        msg += "📸 No photo captured.\n";
+      }
+    } catch (e) {
+      msg += "📸 Error capturing photo.\n";
+    }
+
+    return msg;
+  }
+
+  Future<String> _uploadToFirebase(File file) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child("sos_photos/${DateTime.now().millisecondsSinceEpoch}.jpg");
+    await ref.putFile(file);
+    return await ref.getDownloadURL();
+  }
+
+  Future<void> _startRecording() async {
+    if (await _record.hasPermission()) {
+      final path = "/storage/emulated/0/Download/sos_record_${DateTime.now().millisecondsSinceEpoch}.m4a";
+      await _record.start(path: path, encoder: AudioEncoder.aacLc);
+    }
+  }
+
+  Widget _buildButton(String text) {
+    return Expanded(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _isTriggered ? Colors.red : Colors.grey[850],
+          padding: const EdgeInsets.all(24),
+        ),
+        onPressed: () => _onPressed(text),
+        child: Text(text, style: const TextStyle(fontSize: 24)),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _sosTriggered ? Colors.white : Colors.black,
-      appBar: AppBar(
-        title: GestureDetector(
-          onLongPress: _openPhoneNumbersPage,
-          child: const Text("Calculator"),
-        ),
-        backgroundColor: _sosTriggered ? Colors.red : Colors.green,
-      ),
+      backgroundColor: _isTriggered ? Colors.red[900] : Colors.black,
+      appBar: AppBar(title: const Text("SOS Calculator")),
       body: Column(
-        children: <Widget>[
+        children: [
           Expanded(
             child: Container(
               alignment: Alignment.bottomRight,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               child: Text(
-                _output,
-                style: TextStyle(
-                  fontSize: 36,
-                  color: _sosTriggered ? Colors.red : Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
+                _display,
+                style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          Column(
-            children: [
-              Row(
-                children: [
-                  buildButton("7"),
-                  buildButton("8"),
-                  buildButton("9"),
-                  buildButton("÷", color: Colors.orange),
-                ],
-              ),
-              Row(
-                children: [
-                  buildButton("4"),
-                  buildButton("5"),
-                  buildButton("6"),
-                  buildButton("×", color: Colors.orange),
-                ],
-              ),
-              Row(
-                children: [
-                  buildButton("1"),
-                  buildButton("2"),
-                  buildButton("3"),
-                  buildButton("-", color: Colors.orange),
-                ],
-              ),
-              Row(
-                children: [
-                  buildButton("0"),
-                  buildButton("."),
-                  buildButton("C", color: Colors.red),
-                  buildButton("+", color: Colors.orange),
-                ],
-              ),
-              Row(
-                children: [
-                  buildButton("=", color: Colors.blue),
-                ],
-              ),
-            ],
-          )
+          Row(children: [_buildButton("1"), _buildButton("2"), _buildButton("3")]),
+          Row(children: [_buildButton("4"), _buildButton("5"), _buildButton("6")]),
+          Row(children: [_buildButton("7"), _buildButton("8"), _buildButton("9")]),
+          Row(children: [_buildButton("0")]),
         ],
       ),
     );
