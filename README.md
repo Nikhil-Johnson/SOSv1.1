@@ -1,5 +1,5 @@
 SOS Emergency App
-<p align="center"> <img src="./public/imgs/qz766z83.bmp" width="400" /> <br /> <em>Calculator-based SOS interface</em> </p> <p align="center"> <img src="./public/imgs/f2jw9r04.bmp" width="400" /> <br /> <em>Shake-trigger SOS and notification</em> </p> <p align="center"> <img src="./public/imgs/ojskirln.bmp" width="400" /> <br /> <em>Continuous audio recording in SOS mode</em> </p> <p align="center"> <img src="./public/imgs/xngixjxf.bmp" width="400" /> <br /> <em>Periodic photo capture every 5 minutes</em> </p>
+<p align="center"> <img src="./public/imgs/1.jpeg" width="400" /> <br /> <em>Calculator-based SOS interface</em> </p> <p align="center"> <img src="./public/imgs/5.jpeg" width="400" /> <br /> <em>Shake-trigger SOS</em> </p> <p align="center"> <img src="./public/imgs/2.jpeg" width="400" /> <br /> <em>Phone number slots</em> </p> <p align="center"> <img src="./public/imgs/4.jpeg" width="400" /> <br /> <em>SOS sent when 911 is entered.</em> </p> <p align="center"> <img src="./public/imgs/SOS message.jpg" width="400" /> <br /> <em>SOS SMS</em>
 <h1>
   Table of Contents
 </h1>
