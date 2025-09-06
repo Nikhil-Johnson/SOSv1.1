@@ -2,9 +2,9 @@ SOS Emergency App
 <p align="center"> <img src="./public/imgs/qz766z83.bmp" width="400" /> <br /> <em>Calculator-based SOS interface</em> </p> <p align="center"> <img src="./public/imgs/f2jw9r04.bmp" width="400" /> <br /> <em>Shake-trigger SOS and notification</em> </p> <p align="center"> <img src="./public/imgs/ojskirln.bmp" width="400" /> <br /> <em>Continuous audio recording in SOS mode</em> </p> <p align="center"> <img src="./public/imgs/xngixjxf.bmp" width="400" /> <br /> <em>Periodic photo capture every 5 minutes</em> </p>
 Table of Contents
 
-Introduction
+<h1>Introduction</h1>
 
-Features
+<h2>Features</h2>
 
 Implemented Features
 
