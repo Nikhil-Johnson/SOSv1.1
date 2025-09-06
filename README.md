@@ -18,13 +18,11 @@
 
 The SOS Emergency App is a mobile safety application designed for rapid response during emergencies. Users can trigger SOS alerts discreetly via a calculator interface (911) or by shaking the device. Once activated, the app automatically:
 
-Sends SMS alerts with current location and photo links
+Sends SMS alerts with current location 
 
 Initiates a call to a primary emergency contact
 
-Records audio continuously
-
-Captures photos every 5 minutes until manually stopped
+Changes the UI upon triggering SOS
 
 This app ensures fast, reliable personal safety and prompt emergency communication.
 
@@ -35,7 +33,7 @@ This app ensures fast, reliable personal safety and prompt emergency communicati
 
 - **Shake Detection**: Trigger SOS automatically by shaking the phone.
 
-- **SMS Alerts**: Sends emergency messages containing location and photos.
+- **SMS Alerts**: Sends emergency messages containing location updated every 5 minutes.
 
 - **Location Tracking**: Real-time location sharing with emergency contacts during an alert.
 
