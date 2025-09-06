@@ -1,5 +1,5 @@
 SOS Emergency App
-<p align="center"> <img src="./public/imgs/qz766z83.bmp" width="50%" /> </p> <p align="center"> <img src="./public/imgs/f2jw9r04.bmp" width="50%" /> </p> <p align="center"> <img src="./public/imgs/ojskirln.bmp" width="50%" /> </p> <p align="center"> <img src="./public/imgs/xngixjxf.bmp" width="50%" /> </p>
+<p align="center"> <img src="./public/imgs/qz766z83.bmp" width="400" /> <br /> <em>Calculator-based SOS interface</em> </p> <p align="center"> <img src="./public/imgs/f2jw9r04.bmp" width="400" /> <br /> <em>Shake-trigger SOS and notification</em> </p> <p align="center"> <img src="./public/imgs/ojskirln.bmp" width="400" /> <br /> <em>Continuous audio recording in SOS mode</em> </p> <p align="center"> <img src="./public/imgs/xngixjxf.bmp" width="400" /> <br /> <em>Periodic photo capture every 5 minutes</em> </p>
 Table of Contents
 
 Introduction
@@ -22,112 +22,69 @@ License
 
 Introduction
 
-The SOS Emergency App is a mobile application designed to provide fast and reliable help during emergencies. It allows users to trigger alerts quickly via a calculator interface or by shaking the phone. Once activated, the app sends SMS alerts with location, makes an emergency call, records audio, and captures photos periodically.
+The SOS Emergency App is a mobile safety application designed for rapid response during emergencies. It allows users to quickly send alerts and share critical information such as location, photos, and live audio recordings with emergency contacts.
 
-The app is aimed at enhancing personal safety and ensuring a prompt response from designated contacts.
+The app ensures users can activate SOS mode discreetly through either a calculator interface (911) or by shaking the device. Once activated, it automatically performs the following:
+
+Sends SMS alerts with location and photo links
+
+Initiates a call to a primary emergency contact
+
+Records audio continuously
+
+Captures photos every 5 minutes until manually stopped
 
 Features
 Implemented Features
 
-SOS Trigger via Calculator: Enter 911 to immediately activate the SOS sequence.
+SOS Trigger via Calculator: Enter 911 to activate SOS immediately.
 
 Shake Detection: Trigger SOS automatically by shaking the phone.
 
-SMS Alerts: Sends messages with current location and uploaded photo links to emergency contacts.
+SMS Alerts: Sends emergency messages containing location and photos.
 
-Automated Call: Initiates a call to the primary emergency contact.
+Automated Call: Calls the primary emergency contact.
 
 Continuous Audio Recording: Records audio until manually stopped.
 
-Periodic Photo Capture: Takes a photo every 5 minutes after SOS is activated.
+Periodic Photo Capture: Takes a photo every 5 minutes after SOS is triggered.
 
-Firebase Storage Integration: Stores captured photos for sharing via SMS links.
+Firebase Storage Integration: Stores photos and provides links via SMS.
 
-Visual SOS Indicator: Changes UI color to red to indicate active emergency state.
+Visual SOS Indicator: UI changes color to red during active SOS mode.
 
-Manual Stop: Stop button ends audio recording and periodic photo capture.
+Manual Stop: Stop button in the AppBar ends audio recording and photo capture.
 
 Planned Features
 
-Voice Activation: Hands-free SOS triggering via voice commands.
+Voice activation for hands-free SOS triggering
 
-Real-Time Location Tracking: Continuous location sharing with multiple contacts.
+Real-time location sharing with multiple contacts
 
-Customizable Alert Messages: Users can edit SMS content.
+Customizable alert messages
 
-Health Device Integration: Sync with smartwatches for automatic SOS triggers.
+Integration with health monitoring devices (e.g., smartwatches)
 
-Multiple Language Support: Expand accessibility globally.
+Community support for nearby responders or volunteers
 
-Community Support Feature: Connect with nearby responders or volunteers.
+Multi-language support
 
-Emergency Resources Directory: Quick access to local hospitals, police, and shelters.
+Emergency resources directory
 
 Technologies Used
 
 Framework: Flutter
 
-Backend Services: Firebase (Storage, optional Firestore for contacts)
+Backend Services: Firebase Storage
 
-APIs / Plugins:
+Plugins / APIs:
 
-Geolocator (location)
+Geolocator (Location)
 
-Telephony (SMS and calls)
+Telephony (SMS & Calls)
 
-Shake (device motion)
+Shake (Device Motion Detection)
 
 Image Picker & Camera
 
-Record (audio recording)
-
-Installation
-
-Clone the repository:
-
-git clone https://github.com/Thabhelo/sos.git
-
-
-Navigate to the project directory:
-
-cd sos
-
-
-Install dependencies:
-
-flutter pub get
-
-
-Place your Firebase configuration file:
-
-android/app/google-services.json
-
-
-Run the app on your device:
-
-flutter run
-
-
-Make sure all permissions (location, SMS, camera, microphone) are enabled.
-
-Usage
-
-Launch the app on your device.
-
-Trigger SOS by:
-
-Entering 911 on the calculator, or
-
-Shaking the device.
-
-The app will automatically:
-
-Send SMS with location & photo link
-
-Make a call to the emergency contact
-
-Start continuous audio recording
-
-Capture a photo every 5 minutes
-
-Tap the Stop button to end audio recording and photo capture.
+Record (Audio Recording)
