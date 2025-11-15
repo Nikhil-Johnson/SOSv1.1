@@ -113,4 +113,4 @@ git push origin feature/YourFeature
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-For any inquiries or support, please contact the team at nikhiljohnson2006@gmail.com or shawnsabu10@gmail.com or mnn314127@gmail.com or ashishjoy2006@gmail.com
+For any inquiries or support, please contact the team at nikhiljohnson2006@gmail.com or shawnsabu10@gmail.com
